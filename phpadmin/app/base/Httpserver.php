@@ -43,26 +43,29 @@ class Httpserver
 
         $http->on('request',function (\swoole_http_request $request,\swoole_http_response $response) {
             $response->header("Content-Type", "text/html; charset=utf-8");
-            $method=strtolower($request->server['request_method']);
             $service=$request->get['service'];
-
-            echo "请求方式：".$method."\n";
-            echo "service：".$service."\n";
+            setparam($request->server['request_method'],$request);
 
             try {
                 // 接口响应
-                list($className, $action) = explode('.', $service);
+                list($className, $method_name) = explode('.', $service);
 
                 $apiClassName = '\app\admin\controller\\'.ucfirst($className).'Controller';
-                $api = new $apiClassName();
-                $data = call_user_func(array($api, $action));
 
-                echo $data;
+                if(!class_exists($apiClassName)){
+                    $data = '控制器不存在';
+                    throw new \Exception($data);
+                }
+                $object = new $apiClassName();
+                if(!method_exists ($object,$method_name)){
+                    $data = '方法不存在';
+                    throw new \Exception($data);
+                }
+                $data = call_user_func(array($object, $method_name));
             }catch (\Exception $e){
-                echo "出错了：".$e."\n";
-                throw $e;
+                $data = $e->getMessage();
             }
-
+            $response->end($data);
         });
         $http->start();
     }

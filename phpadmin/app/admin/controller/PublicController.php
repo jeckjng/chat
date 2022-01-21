@@ -1,11 +1,17 @@
 <?php
 namespace app\admin\controller;
 
-class PublicController
+class PublicController extends AdminController
 {
     public function login(){
-        echo 'login'."\n";
-        return '进入login'."\n";
+        echo json_encode(getparam())."\n";
+
+
+
+        $this->assign([
+            'msg'=>'进入login',
+            ]);
+        return $this->fetch();
     }
 
 }

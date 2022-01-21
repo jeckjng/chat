@@ -45,3 +45,36 @@ function exceptionHandler(Throwable $e)
         echo "catch Exception: " . $e->getCode() . '   ' . $e->getMessage() . '<br>';
     }
 }
+
+function setparam($method='',$request){
+    $method = strtolower($method);
+    switch ($method){
+        case 'get':
+            $_GET = $request->get;
+            break;
+        case 'post':
+            $_POST = $request->post;
+            break;
+        default:
+            return;
+    }
+    return;
+}
+
+function getparam($method='param'){
+    $method = strtolower($method);
+    switch ($method){
+        case 'get':
+            $data = $_GET;
+            break;
+        case 'post':
+            $data = $_POST;
+            break;
+        case 'param':
+            $data = array_merge($_GET,$_POST);
+            break;
+        default:
+            $data = array();
+    }
+    return $data;
+}

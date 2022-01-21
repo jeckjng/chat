@@ -1,6 +1,8 @@
 <?php
 namespace app\base;
 
+//use app\admin\controller\PublicController;
+
 class Httpserver
 {
     public function run(){
@@ -29,8 +31,8 @@ class Httpserver
         // 定时器
         $process = new \Swoole\Process(function($process) use ($http) {
             $dbconn = '';
-            $http->tick(3000, function() use ($dbconn) {
-                echo "定时器 \n";
+            $http->tick(6000, function() use ($dbconn) {
+//                echo "定时器 \n";
             });
         });
         $http->addProcess($process);
@@ -40,7 +42,27 @@ class Httpserver
         });
 
         $http->on('request',function (\swoole_http_request $request,\swoole_http_response $response) {
-            echo "请求：\n";
+            $response->header("Content-Type", "text/html; charset=utf-8");
+            $method=strtolower($request->server['request_method']);
+            $service=$request->get['service'];
+
+            echo "请求方式：".$method."\n";
+            echo "service：".$service."\n";
+
+            try {
+                // 接口响应
+                list($className, $action) = explode('.', $service);
+
+                $apiClassName = '\app\admin\controller\\'.ucfirst($className).'Controller';
+                $api = new $apiClassName();
+                $data = call_user_func(array($api, $action));
+
+                echo $data;
+            }catch (\Exception $e){
+                echo "出错了：".$e."\n";
+                throw $e;
+            }
+
         });
         $http->start();
     }

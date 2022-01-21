@@ -20,7 +20,7 @@ class Config
     public function get($name){
         $name = strtolower($name);
         $arrt = false;
-        if (!strpos($name, '.')) {
+        if(!strpos($name, '.')) {
             // 非二级配置时
             $file = CONF_PATH .'../config' . DS . $name . CONF_EXT;
         }else{
